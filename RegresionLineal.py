@@ -11,6 +11,20 @@ def carga_csv(file_name):
     # suponemos que siempre trabajaremos con float
     return valores.astype(float)
 
+def make_data ( t0_range , t1_range , X , Y ) :
+    """ Genera las matrices Theta0 , Theta1 , Coste para generar un plot en 3D"""
+    step = 0.1
+    Theta0 = np.arange ( t0_range[0], t0_range[1], step )
+    Theta1 = np.arange ( t1_range[0], t1_range[1], step )
+    Theta0 , Theta1 = np.meshgrid (Theta0 , Theta1)
+    coste = np.empty_like (Theta0)
+    for ix , iy in  np.ndindex(Theta0.shape):
+        coste [ ix , iy ] = coste(X, Y ,[Theta0 [ix ,iy ] , Theta1[ix ,iy]])
+    return [ Theta0 , Theta1 , coste ]
+
+
+
+
 datos=carga_csv("ex1data1.csv")
 alpha=0.01
 ite=1500
