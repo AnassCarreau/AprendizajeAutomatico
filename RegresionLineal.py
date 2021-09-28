@@ -19,6 +19,9 @@ def coste(X,Y,theta):
     sum=0
     for i in range(m):
         sum+=np.square(theta[0]+theta[1]*X[i] - Y[i])
+    #esto sustituiria el for de arriba
+    #aux = np.square(theta[0]+theta[1]*X - Y)
+    #sum = np.sum(aux)
     return sum/(2*m)
 def make_data ( t0_range , t1_range , X , Y ) :
     """ Genera las matrices Theta0 , Theta1 , Coste para generar un plot en 3D
