@@ -6,7 +6,7 @@ from pandas.io.parsers import read_csv
 import matplotlib.pyplot as plt
 from matplotlib import cm
 
-
+#metodo que se encrga de la carga de los datos desde el fichero
 def carga_csv(file_name):
     """carga el fichero csv especificado y lo
  devuelve en un array de numpy
@@ -14,15 +14,18 @@ def carga_csv(file_name):
     valores = read_csv(file_name, header=None).to_numpy()
     # suponemos que siempre trabajaremos con float
     return valores.astype(float)
+
+#metodo que se encarga d calcular el coste
 def coste(X,Y,theta):
     m=len(X)
     sum=0
-    for i in range(m):
-        sum+=np.square(theta[0]+theta[1]*X[i] - Y[i])
+    #for i in range(m):
+    #   sum+=np.square(theta[0]+theta[1]*X[i] - Y[i])
     #esto sustituiria el for de arriba
-    #aux = np.square(theta[0]+theta[1]*X - Y)
-    #sum = np.sum(aux)
+    aux = np.square(theta[0]+theta[1]*X - Y)
+    sum = np.sum(aux)
     return sum/(2*m)
+
 def make_data ( t0_range , t1_range , X , Y ) :
     """ Genera las matrices Theta0 , Theta1 , Coste para generar un plot en 3D
         del coste para valores de theta_0 en el intervalo t0_range y
@@ -73,7 +76,7 @@ plt.contour(data[0], data[1], data[2],
  np.logspace(-2, 3, 20), colors='blue')
 plt.savefig("grafica2D.png")
 
-#para pintar unha figura 3D
+#para pintar una figura 3D
 fig = plt.figure()
 ax = fig.gca(projection='3d')
 
