@@ -25,8 +25,6 @@ def normalizacion(X):
    newMatriz = np.copy(X)
    for i in np.arange(n-1):
      newMatriz[:,i+1] =  (X[:,i+1]-medias[i+1]) / desviacion[i+1]
-  # print(X)
-  # print(n)
    print(newMatriz)
    return newMatriz,medias,desviacion
 
@@ -48,50 +46,27 @@ def gradiente(X, Y, Theta, alpha):
    NuevaTheta[i] -= (alpha / m) * Aux_i.sum()
  return NuevaTheta
 
-def descenso_gradiente2(X, Y, alpha, m, n):
-    Thetas = np.zeros(X[1].size)
-
-    for i in range(400):
-
-        Thetas = Thetas - alpha * (1 / m) * ( X.T.dot(np.dot(X, Thetas) - Y) )
-
-        coste(X, Y, Thetas)
-        costes = []
-        costes = np.append(costes, coste(X, Y, Thetas))
-
-    return Thetas
-
-
-
-
-
 
 
 
 def descenso_gradiente(X,Y,alpha):
   matriz_norm, medias, desviacion = normalizacion(X)
   ite = 1500
-  m = np.shape(X)[0]
   n = np.shape(X)[1]
   Costes = np.zeros(ite)
-  #print(matriz_norm)
-  #print(medias)
-  #print(desviacion)
   Thetas = np.zeros(n)
   for i in range(ite):
     Thetas = gradiente(matriz_norm,Y,Thetas,alpha)
-    Costes[i] = coste(X,Y,Thetas)
-    print( Costes[i])
-  print("hola")
-  print(Thetas)
-  print (Costes)
-  #print(coste(X,Y,Thetas))
-  plt.plot(Costes, [0,ite])
+    Costes[i] = coste(matriz_norm,Y,Thetas)
+
+  plt.figure()
+  x = np.linspace(0, 500, ite, endpoint = True)
+  x = np.reshape(x, (ite, 1))
+  plt.plot(x, Costes)
+  print("Evolucion del coste")
   plt.savefig("coste.png")
+  plt.show()
 
-
-
-  
 
 datos = carga_csv('ex1data2.csv')
 X = datos[:, :-1]
