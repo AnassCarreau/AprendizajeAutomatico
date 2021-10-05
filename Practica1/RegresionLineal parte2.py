@@ -25,7 +25,7 @@ def normalizacion(X):
    newMatriz = np.copy(X)
    for i in np.arange(n-1):
      newMatriz[:,i+1] =  (X[:,i+1]-medias[i+1]) / desviacion[i+1]
-   print(newMatriz)
+  # print(newMatriz)
    return newMatriz,medias,desviacion
 
 
@@ -58,14 +58,13 @@ def descenso_gradiente(X,Y,alpha):
   for i in range(ite):
     Thetas = gradiente(matriz_norm,Y,Thetas,alpha)
     Costes[i] = coste(matriz_norm,Y,Thetas)
-
   plt.figure()
   x = np.linspace(0, 500, ite, endpoint = True)
   x = np.reshape(x, (ite, 1))
   plt.plot(x, Costes)
-  print("Evolucion del coste")
   plt.savefig("coste.png")
   plt.show()
+  return Thetas,Costes,medias,desviacion
 
 
 datos = carga_csv('ex1data2.csv')
@@ -78,6 +77,8 @@ n = np.shape(X)[1]
 # añadimos una columna de 1's a la X
 X = np.hstack([np.ones([m, 1]), X])
 alpha = 0.01
-#Thetas, costes = descenso_gradiente(X, Y, alpha)
-descenso_gradiente(X, Y, alpha)
-
+Thetas,Costes,medias,desviacion = descenso_gradiente(X, Y, alpha)
+extension=(1650-medias[1])/desviacion[1]
+habitaciones=(3-medias[2])/desviacion[2] 
+prediccion=[1,extension,habitaciones]
+print(np.matmul(np.transpose(Thetas),prediccion))
