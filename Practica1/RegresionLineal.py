@@ -18,10 +18,6 @@ def carga_csv(file_name):
 #metodo que se encarga d calcular el coste
 def coste(X,Y,theta):
     m=len(X)
-    sum=0
-    #for i in range(m):
-    #   sum+=np.square(theta[0]+theta[1]*X[i] - Y[i])
-    #esto sustituiria el for de arriba
     aux = np.square(theta[0]+theta[1]*X - Y)
     sum = np.sum(aux)
     return sum/(2*m)

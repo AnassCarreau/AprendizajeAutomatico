@@ -33,4 +33,5 @@ n = np.shape(X)[1]
 X = np.hstack([np.ones([m, 1]), X])
 Thetas=Ecuacion_normal(X, Y)
 prediccion=[1,1650,3]
+print("Resultado Regresion Lineal Ecuacion  Normal :")
 print(np.matmul(np.transpose(Thetas),prediccion))

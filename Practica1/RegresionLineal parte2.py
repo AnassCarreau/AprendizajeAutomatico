@@ -21,11 +21,9 @@ def normalizacion(X):
    n = np.shape(X)[1]
    medias = np.mean(X,0,dtype=np.float64)
    desviacion = np.std(X,0,dtype=np.float64)
-   #newMatriz = (X-medias) / desviacion
    newMatriz = np.copy(X)
    for i in np.arange(n-1):
      newMatriz[:,i+1] =  (X[:,i+1]-medias[i+1]) / desviacion[i+1]
-  # print(newMatriz)
    return newMatriz,medias,desviacion
 
 
@@ -81,4 +79,5 @@ Thetas,Costes,medias,desviacion = descenso_gradiente(X, Y, alpha)
 extension=(1650-medias[1])/desviacion[1]
 habitaciones=(3-medias[2])/desviacion[2] 
 prediccion=[1,extension,habitaciones]
+print("Resultado Regresion Lineal Descenso Gradiente :")
 print(np.matmul(np.transpose(Thetas),prediccion))
