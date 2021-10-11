@@ -19,7 +19,7 @@ def pinta_frontera_recta(X, Y, theta):
 
  # el cuarto parámetro es el valor de z cuya frontera se
  # quiere pintar
- plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors='b')
+ plt.contour(xx1, xx2, h, [0,5], linewidths=1, colors='b')
  plt.savefig("frontera.pdf")
  plt.close()
 
@@ -59,12 +59,17 @@ plt.scatter(X[posN, 0], X[posN, 1], marker = 'o', c = 'y')
 X = np.hstack([np.ones([np.shape(X)[0], 1]), X])
 n=np.shape(X)[1]
 Theta=np.zeros(n)
-print(cost(Theta, X, Y))
-print(gradiente(Theta, X, Y))
+#print(cost(Theta, X, Y))
+#print(gradiente(Theta, X, Y))
 
 
 result = opt.fmin_tnc ( func=cost,x0=Theta , fprime=gradiente , args =(X, Y) )
 theta_opt = result [0]
-print(result[1])
-#pinta_frontera_recta(X,Y,theta_opt)
+#print(result[1])
+pinta_frontera_recta(X,Y,theta_opt)
+print("hola")
+print(theta_opt)
+
+aux = cost(theta_opt,X,Y)
+print(aux)
 plt.show()
