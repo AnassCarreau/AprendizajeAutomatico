@@ -6,8 +6,9 @@ import scipy.optimize as opt
 
 def pinta_frontera_recta(X, Y, theta):
  plt.figure()
- x1_min, x1_max = X[:, 0].min(), X[:, 0].max()
- x2_min, x2_max = X[:, 1].min(), X[:, 1].max()
+
+ x1_min, x1_max = X[:, 1].min(), X[:, 1].max()
+ x2_min, x2_max = X[:, 2].min(), X[:, 2].max()
 
  xx1, xx2 = np.meshgrid(np.linspace(x1_min, x1_max),
  np.linspace(x2_min, x2_max))
@@ -19,9 +20,8 @@ def pinta_frontera_recta(X, Y, theta):
 
  # el cuarto parámetro es el valor de z cuya frontera se
  # quiere pintar
- plt.contour(xx1, xx2, h, [0,5], linewidths=1, colors='b')
- plt.savefig("frontera.pdf")
- plt.close()
+ plt.contour(xx1, xx2, h, [0.5], linewidths=1, colors='b')
+ 
 
 def carga_csv(file_name):
     """carga el fichero csv especificado y lo
@@ -45,15 +45,17 @@ def gradiente(theta, X, Y):
     H=sigmoid(np.matmul(X, theta))
     return (1/len(Y)) * np.matmul((X.T), H-Y)
 
+def porcentaje(theta):
+    print(theta)
+    sig= sigmoid(theta)
+    return len(np.where(sig >= 0.5))/len(sig)
+
 datos=carga_csv("ex2data1.csv")
 X=datos[:, :-1]
 Y=datos[:, -1]
 # Obtiene un vector con los índices de los ejemplos positivos
 pos=np.where(Y == 1)
 posN=np.where(Y == 0)
-# Dibuja los ejemplos positivos
-plt.scatter(X[pos, 0], X[pos, 1], marker = '+', c = 'k')
-plt.scatter(X[posN, 0], X[posN, 1], marker = 'o', c = 'y')
 
 #Añadir fila de unos
 X = np.hstack([np.ones([np.shape(X)[0], 1]), X])
@@ -66,10 +68,13 @@ Theta=np.zeros(n)
 result = opt.fmin_tnc ( func=cost,x0=Theta , fprime=gradiente , args =(X, Y) )
 theta_opt = result [0]
 #print(result[1])
-pinta_frontera_recta(X,Y,theta_opt)
 print("hola")
-print(theta_opt)
-
 aux = cost(theta_opt,X,Y)
 print(aux)
+pinta_frontera_recta(X,Y,theta_opt)
+plt.scatter(X[pos, 1], X[pos, 2], marker = '+', c = 'k')
+plt.scatter(X[posN, 1], X[posN, 2], marker = 'o', c = 'y')
 plt.show()
+plt.savefig("frontera.pdf")
+plt.close()
+print (porcentaje(theta_opt))
