@@ -67,8 +67,6 @@ Theta=np.zeros(n)
 
 result = opt.fmin_tnc ( func=cost,x0=Theta , fprime=gradiente , args =(X, Y) )
 theta_opt = result [0]
-#print(result[1])
-print("hola")
 aux = cost(theta_opt,X,Y)
 print(aux)
 pinta_frontera_recta(X,Y,theta_opt)
