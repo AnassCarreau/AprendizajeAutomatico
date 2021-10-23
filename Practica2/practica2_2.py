@@ -44,10 +44,6 @@ def gradiente(theta, X, Y,landa):
     H=sigmoid(np.matmul(X, theta))
     return (1/len(Y)) * np.matmul((X.T), H-Y) + (landa/len(X))*theta
 
-def porcentaje(theta):
-    print(theta)
-    sig= sigmoid(theta)
-    return len(np.where(sig >= 0.5))/len(sig)
 
 datos=carga_csv("ex2data2.csv")
 X=datos[:, :-1]
@@ -56,9 +52,6 @@ landa=1
 # Obtiene un vector con los índices de los ejemplos positivos
 pos=np.where(Y == 1)
 posN=np.where(Y == 0)
-
-
-
 
 poly=PolynomialFeatures(6)
 Xfit=poly.fit_transform(X)

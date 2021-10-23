@@ -45,10 +45,12 @@ def gradiente(theta, X, Y):
     H=sigmoid(np.matmul(X, theta))
     return (1/len(Y)) * np.matmul((X.T), H-Y)
 
-def porcentaje(theta):
-    print(theta)
-    sig= sigmoid(theta)
-    return len(np.where(sig >= 0.5))/len(sig)
+#Calculo del porcentaje de ejemplos clasificados correctamente
+def calcula_porcentaje(X,Y,theta):
+    sig = sigmoid(np.matmul(X,theta))
+    ev_correct = np.sum((sig >= 0.5) == Y)
+    return ev_correct/len(sig) * 100
+
 
 datos=carga_csv("ex2data1.csv")
 X=datos[:, :-1]
@@ -75,4 +77,5 @@ plt.scatter(X[posN, 1], X[posN, 2], marker = 'o', c = 'y')
 plt.show()
 plt.savefig("frontera.pdf")
 plt.close()
-print (porcentaje(theta_opt))
+print ("Porcentaje : ")
+print (calcula_porcentaje(X,Y,theta_opt))
