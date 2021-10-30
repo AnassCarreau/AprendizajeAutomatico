@@ -28,7 +28,16 @@ def gradiente(theta, X, Y,landa):
     return aux + ((landa/len(X) * Theta2) )
 
 
-
+def h(X, thetas1, thetas2):
+    a1 = X
+    #m = np.shape(X)[0]
+    #a1 = np.hstack([np.ones([m, 1]), X])
+    # z2 = np.matmul(thetas1, a1)
+    z2 = np.matmul(thetas1, np.insert(a1,0,1))
+    a2 = sigmoid(z2)
+    z3 = np.matmul(thetas2, np.insert(a2,0,1))
+    a3 = sigmoid(z3)
+    return a3
 
 
 def getEtiqueta(Y, etiqueta):
@@ -50,34 +59,6 @@ def porcentaje (theta, X, Y):
     return porcentajeNeg + porcentajePos
 
 
-def oneVsAll(X, y, n_labels, landa):
-    """
-    oneVsAll entrena varios clasificadores por regresión logística con término
-    de regularización 'reg' y devuelve el resultado en una matriz, donde
-    la fila i-ésima corresponde al clasificador de la etiqueta i-ésima
-    """
-    m = X.shape[1]
-    theta = np.zeros((n_labels, m))
-    y_etiquetas = np.zeros((y.shape[0], n_labels))
-
-    for i in range(n_labels):
-        y_etiquetas[:,i] = getEtiqueta(y, i)
-    y_etiquetas[:,0] = getEtiqueta(y, 10)
-
-    for i in range(n_labels):
-        print("I: ", i)
-        result = opt.fmin_tnc(func=cost, x0=theta[i,:], fprime=gradiente, args=(X, y_etiquetas[:,i], landa))
-        theta[i, :] = result[0]
-
-    evaluacion = np.zeros(n_labels)
-    for i in range(n_labels):
-        evaluacion[i] = porcentaje(theta[i,:], X, y_etiquetas[:,i])
-    print("Evaluacion: ", evaluacion)
-    print("Evaluacion media: ", evaluacion.mean())
-    return 0
-
-
-
 
 
 #carga de los datos
@@ -85,13 +66,26 @@ data = loadmat('ex3data1.mat')
 y = data ['y']
 X = data ['X']
 #almacena los datos leidos en X,Y
+thetas = loadmat("ex3weights.mat")
+thetas1,thetas2 = thetas["Theta1"], thetas["Theta2"]
+
+#oneVsAll(X, y, 10, 0.1)
+
+sample = np.random.choice(X.shape[0],10)
+plt.imshow(X[sample, :].reshape(-1,20).T)
+plt.axis('off')
 
 
-oneVsAll(X,y,10,0.1)
+aux = np.zeros(10)
+print ("Sample: ", sample)
+for i in range(10):
+    aux[i] = np.argmax(h(X[sample[i],:],thetas1,thetas2))
+print("My guess are: ", (aux)+1)
+numAciertos = 0
+for i in range(X.shape[0]):
+    aux2 = np.argmax(h(X[i,:],thetas1, thetas2))
+    if(aux2+1) == y[i]:
+        numAciertos +=1
+print("Porcentaje de aciertos: ", numAciertos / X.shape[0])
+plt.show()
 
-
-#Selecciona aleatoriamente 10 ejemplos y los pinta
-#sample = np.random.choice(X.shape[0],10)
-#plt.imshow(X[sample , :].reshape(-1,20).T)
-#plt.axis('off')
-#plt.show()
