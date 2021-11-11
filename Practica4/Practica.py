@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from scipy.io import loadmat
 import scipy.optimize as opt
 from scipy.optimize import minimize
-from displayData import displayData
+import displayData as displayData
 #from sklearn.preprocessing import PolynomialFeatures
 
 
@@ -175,6 +175,16 @@ num_labels = 10
 data = loadmat('ex4data1.mat')
 Y = data['y'].ravel() # el metodo ravel hace que y pase de un shape(5000,1) a (5000,)
 X = data['X']
+nMuestras = len(X)
+
+
+print(Y[2500])
+plt.figure()
+displayData.displayImage(X[2500])
+plt.savefig("Input_sample")
+plt.show()
+
+
 thetas = loadmat("ex4weights.mat")
 thetas1 = thetas["Theta1"] # Theta1 es de dimensión 25 x 401
 thetas2 = thetas["Theta2"] # Theta2 es de dimensión 10 x 26
@@ -189,29 +199,9 @@ print("El coste con thetas entrenados es: ", costFun(X_aux, Y_aux, thetas1, thet
 Thetas = [thetas1, thetas2]
 unrolled_Thetas = [Thetas[i].ravel() for i,_ in enumerate(Thetas)]
 
-NNTest(400, 25, 10, 1, X, Y, 70)
+NNTest(400, 25, 10, 1, X, Y, 100)
 ##Gradiente
 
 
 
 
-#nn_params = np.concatenate(unrolled_Thetas)
-## Search using scipy
-#result = minimize(fun=backprop, x0=nn_params, args=(input_layer_size, hidden_layer_size, n_et, X, y_onepoint, 1), method='CG', jac=True, options={'maxiter': 70})
-#theta1, theta2 = unroll_thetas(result.x, input_layer_size, hidden_layer_size, n_et)
-### Create NN with optimized Thetas
-##X = add_ones(X)
-##h = forward_propagate(X, theta1, theta2)[4]
-##correct = 0
-##wrong = 0
-### Check answer with real one
-##for i in range(len(X)):
-##    maxIndex = np.argmax(h[i])
-##    if(maxIndex == Y[i]):
-##        correct += 1
-##    else:
-##        wrong += 1
-
-#print("Hit: ", correct)
-#print("Miss: ", wrong)
-#print("Accuracy: ", format((correct / (correct + wrong)) * 100, '.2f'), "%")
