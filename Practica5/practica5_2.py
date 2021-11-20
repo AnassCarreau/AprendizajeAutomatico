@@ -55,6 +55,19 @@ def RegresionLinealRegularizada(X, y, coeficienteLambda):
     theta = results.x
     return theta
 
+def curvaAprendizaje(X, y, Xval, yval, coeficienteLambda):
+    m = len(X)
+    errorTrain= np.zeros((m,1))
+    errorVal = np.zeros((m,1))
+
+    for i in range(1, m+1):
+        theta = RegresionLinealRegularizada(X[:i], y[:i], coeficienteLambda)
+        errorTrain[i-1] = CosteGrandiente(X[:i], y[:i], theta, 0)[0]
+        errorVal[i-1] = CosteGrandiente(Xval, yval, theta, 0)[0]
+    
+    return errorTrain, errorVal
+
+
 
 
 landa=0
@@ -66,21 +79,30 @@ ytest=data['ytest']
 Xval=data['Xval']
 yval=data['yval']
 
+#insertamos una fila de 1s en la primera fila de la matriz
+Xfila1 = np.insert(X, 0, 1, axis=1)
+XvalFila1 = np.insert(Xval, 0, 1, axis=1)
+
+
 theta = np.array([[1], [1]])
 newX = np.insert(X, 0,1, axis=1)
-
+#print(Xfila1)
+print("coste")
 print(cost(theta,newX,y,landa))
+print("gradiente")
 print(gradiente(theta,newX,y,landa))
 
 
 theta = np.zeros((X.shape[1], 1))
 theta = RegresionLinealRegularizada(newX, y, 0)
+m = len(X)
+errorTrain, errorVal = curvaAprendizaje(Xfila1, y, XvalFila1, yval, 0)
 
 
 
 plt.figure(figsize=(8,6))
-plt.title('Regresión lineal regularizada')
-plt.plot(X, y, 'rx')
-plt.plot(X, np.dot(np.insert(X, 0, 1, axis=1),theta), '--')
+plt.title('Curvas de aprendizaje')
+plt.plot(range(1,m+1), errorTrain, 'b', label='Train')
+plt.plot(range(1, m+1), errorVal, 'g', label='Cross Validation')
+plt.legend()
 plt.show()
-plt.close()
