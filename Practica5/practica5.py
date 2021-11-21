@@ -9,12 +9,9 @@ import math
 import scipy.optimize as opt
 
 
-def sigmoid(x):
-    s = 1 / (1 + np.exp(-x))
-    return s
 
 
-def cost(theta, X, Y,landa):
+def cost(theta, X, Y,landa=0):
     theta = theta.reshape(-1, y.shape[1])
     #theta=theta[1:]
     costeReguralizado =(landa / len(X)*2) * np.sum(np.square(theta))
@@ -22,7 +19,7 @@ def cost(theta, X, Y,landa):
     return costeNoReguralizado +costeReguralizado 
     
 
-def gradiente(theta, X, Y,landa):
+def gradiente(theta, X, Y,landa=0):
     m=len(X)
     gradienteNoRegularizada = (1/m)*np.dot(X.T,np.dot(X,theta)-y)
     gradiente = gradienteNoRegularizada +(landa/m)*theta
@@ -31,31 +28,11 @@ def gradiente(theta, X, Y,landa):
     return gradiente.flatten() 
 
 
+def gradiente_min(thetas, matrizX, vectorY, _lambda=0.):
+    return gradiente(thetas, matrizX, vectorY, _lambda=0.).flatten()
 
-
-def CosteGrandiente(X, y, theta, coeficienteLambda):
-    m = len(X)
-    theta = theta.reshape(-1, y.shape[1])
-    costeReguralizado = (coeficienteLambda / (2*m)) * np.sum(np.square(theta[1:len(theta)]))
-    costeNoReguralizado = (1/(2*m)) * np.sum(np.square(np.dot(X,theta)-y))
-    costeTotal = costeReguralizado + costeNoReguralizado
-
-    gradiente =np.zeros(theta.shape)
-    gradiente = (1/m)*np.dot(X.T, np.dot(X, theta)-y)+(coeficienteLambda/m)*theta
-    gradienteNoRegularizada = (1/m)*np.dot(X.T,np.dot(X,theta)-y)
-    gradiente[0] = gradienteNoRegularizada[0]
-
-    return (costeTotal, gradiente.flatten())
-
-def RegresionLinealRegularizada(X, y, coeficienteLambda):
-    thetaIni = np.zeros((X.shape[1], 1))
-    def fcoste(theta):
-        return CosteGrandiente(X, y, theta, coeficienteLambda)
-    results = opt.minimize(fun=fcoste, x0=thetaIni, method='CG', jac=True,options={'maxiter':200})
-    theta = results.x
-    return theta
-
-
+def optimizarTheta(thetas, matrizX, vectorY, _lambda=0.,_print=True):
+    return opt.fmin_cg(cost,x0=thetas,fprime=gradiente_min, args=(matrizX,vectorY,_lambda),disp=_print, epsilon=1.49e-12, maxiter=1000)
 
 landa=0
 data = loadmat('ex5data1.mat')
@@ -72,11 +49,10 @@ newX = np.insert(X, 0,1, axis=1)
 print(cost(theta,newX,y,landa))
 print(gradiente(theta,newX,y,landa))
 
+X_unos = np.insert(X,0,1,axis=1)
 
 theta = np.zeros((X.shape[1], 1))
-theta = RegresionLinealRegularizada(newX, y, 0)
-
-
+theta = optimizarTheta(theta,X_unos,y,0.)
 
 plt.figure(figsize=(8,6))
 plt.title('Regresión lineal regularizada')
