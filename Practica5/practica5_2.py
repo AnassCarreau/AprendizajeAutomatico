@@ -101,8 +101,10 @@ errorTrain, errorVal = curvaAprendizaje(Xfila1, y, XvalFila1, yval, 0)
 
 
 plt.figure(figsize=(8,6))
-plt.title('Curvas de aprendizaje')
-plt.plot(range(1,m+1), errorTrain, 'b', label='Train')
-plt.plot(range(1, m+1), errorVal, 'g', label='Cross Validation')
+title='Learning curve for linear regression'
+plt.title(title)  
+plt.plot(range(1,m+1), errorTrain, label='Train')
+plt.plot(range(1, m+1), errorVal, label='Cross Validation')
 plt.legend()
+plt.savefig(title+'.png')
 plt.show()
