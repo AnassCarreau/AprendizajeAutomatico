@@ -11,9 +11,9 @@ relativeDir = os.path.dirname(__file__)
 
 def drawFunctionPoints(X, y):
     pos1 = np.where(y == 0)
-    plt.scatter(X[pos1, 0], X[pos1, 1], marker='.', c='red')
+    plt.scatter(X[pos1, 0], X[pos1, 1], marker='.', c='y')
     pos2 = np.where(y == 1)
-    plt.scatter(X[pos2, 0], X[pos2, 1], marker='+', c='blue')
+    plt.scatter(X[pos2, 0], X[pos2, 1], marker='+', c='k')
 
 def main():
     # Load data
