@@ -78,7 +78,7 @@ def main():
       # X = add_ones(X)
        X= np.hstack((  np.ones((valores.shape[0], 1), dtype=valores.dtype), valores))
        print(X)
-       x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size = 0.8,shuffle = True)
+       x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size = 0.2,shuffle = True)
        theta = np.zeros((X.shape[1],1))
        result = opt.fmin_tnc(func=coste,x0=theta ,fprime=gradiente,args =(x_train, y_train,landa))
        theta = result[0]
