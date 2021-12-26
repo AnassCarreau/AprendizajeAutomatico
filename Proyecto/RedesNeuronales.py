@@ -29,14 +29,18 @@ def gradiente(theta, X, Y,landa):
 #A1==A2
 #Z2==Z3
 #A2==H
-def forward_propagate(Theta1, Theta2, X):
-    z1 = Theta1.dot(X.T)
-    a1 = sigmoid(z1)
-    tuple = (np.ones(len(a1[0])), a1)
-    a1 = np.vstack(tuple)
-    z2 = Theta2.dot(a1)
-    a2 = sigmoid(z2)
-    return z1, a1, z2, a2
+def forward_propagate(X, theta1, theta2):
+    m = X.shape[0]
+    #a1 = np.hstack([np.ones([m, 1]), X]) No añadimos porque ya lo hicimos antes
+    z2 = np.dot(X, theta1.T)
+    a2 = np.hstack([np.ones([m, 1]), sigmoid(z2)])
+    z3 = np.dot(a2, theta2.T)
+    h = sigmoid(z3)
+
+    return X, z2, a2, z3, h
+
+
+
 
 
 def random_thetas(l_in, l_out, range=0.12):
@@ -52,25 +56,14 @@ def unroll_thetas(params, n_entries, n_hidden, n_et):
     return theta1, theta2
 
 
-def costFun(X, y, theta1, theta2, reg):
-    #Cambios para poder operar
-    X = np.array(X)
-    y = np.array(y)
-    muestras = len(y)
-
-    theta1 = np.array(theta1)
-    theta2 = np.array(theta2)
-    
-    #predecimos la salida de los valores para la matriz de pesos de theta y nos quedamos con el valor predicho en la
-    #variable hipothesis y calculamos el coste con el valor de dicha variable
-    hipothesis  = forward_propagate(theta1, theta2, X)[3]
-    cost = np.sum((-y.T)*(np.log(hipothesis)) - (1-y.T)*(np.log(1- hipothesis)))/muestras
-    
-    #calculo del coste con regularización 
-    regcost = np.sum(np.power(theta1[:, 1:], 2)) + np.sum(np.power(theta2[:,1:], 2))
-    regcost = regcost * (reg/(2*muestras))
-
-    return cost + regcost
+def CosteFun(params_rn, num_entradas, num_ocultas, num_etiquetas, X, Y, reg):
+    theta1,theta2 = unroll_thetas(params_rn, num_entradas, num_ocultas, num_etiquetas)
+    a1,z2,a2,z3,h = forward_propagate(X,theta1,theta2)
+    J = 0
+    for i in range(len(X)):
+        J += (-1/(len(X)))*(np.dot(Y[i],np.log(h[i]))+np.dot((1-Y[i]),np.log(1-h[i])))
+    J += (reg/ (2*len(X))) * ( ( np.sum(np.square(theta1[:,1:]))) + (np.sum(np.square(theta2[:,1:]))) )
+    return J
 
 
 def getYMatrix(Y, nEtiquetas):
@@ -93,46 +86,33 @@ def sigmoideDerivada(value):
     temp = sigmoid(value)
     return temp * (1 - temp)
     
-def backprop(params_rn, num_entradas,num_ocultas, num_etiquetas, X, Y, reg):
-    th1 = np.reshape(params_rn[:num_ocultas *(num_entradas + 1)],(num_ocultas, (num_entradas+1)))
-    # theta2 es un array de (num_etiquetas, num_ocultas)
-    th2 = np.reshape(params_rn[num_ocultas*(num_entradas + 1): ], (num_etiquetas,(num_ocultas+1)))
-    
-    X_unos = np.hstack([np.ones((len(X), 1)), X])
-    nMuestras = len(X)
-    y = np.zeros((nMuestras, num_etiquetas))
-    
-    y = y + getYMatrix(Y, num_etiquetas)
-    
-    coste = costFun(X_unos, y, th1, th2, reg)
-    
-    #Backpropagation
-    
-    # Forward propagation para obtener una hipótesis y los valores intermedios
-    # de la red neuronal
-    z2, a2, z3, a3 = forward_propagate(th1, th2, X_unos)
-    
-    gradW1 = np.zeros(th1.shape)
-    gradW2 = np.zeros(th2.shape)
-    
-    # Coste por capas
-    delta3 = np.array(a3 - y.T)
-    delta2 = th2.T[1:, :].dot(delta3)*sigmoideDerivada(z2)
-    
-    # Acumulacion de gradiente
-    gradW1 = gradW1 + (delta2.dot(X_unos))
-    gradW2 = gradW2 + (delta3.dot(a2.T))
-    
-    G1 = gradW1/float(nMuestras)
-    G2 = gradW2/float(nMuestras)
-    
-    # suma definitiva
-    G1[:, 1: ] = G1[:, 1:] + (float(reg)/float(nMuestras))*th1[:, 1:]
-    G2[:, 1: ] = G2[:, 1:] + (float(reg)/float(nMuestras))*th2[:, 1:]
-    
-    gradients = np.concatenate((G1, G2), axis = None)
-    
-    return coste, gradients
+def backprop(params_rn,num_entradas,num_ocultas,num_etiquetas,X,y, reg):
+    #Luego "deserializamos" los parametros
+    m = X.shape[0]
+    X = add_ones(X)
+    theta1,theta2 = unroll_thetas(params_rn, num_entradas, num_ocultas, num_etiquetas)
+    a1,z2,a2,z3,h = forward_propagate(X,theta1,theta2)
+    cost = CosteFun(params_rn,num_entradas, num_ocultas, num_etiquetas, X, y, reg)
+    #Claculo de deltas
+    delta1 = 0
+    delta2 = 0
+    for t in range(m):
+        a1t = a1[t, :] # (1, 401)
+        a2t = a2[t, :] # (1, 26)
+        ht = h[t, :] # (1, 10)
+        yt = y[t] # (1, 10)
+        d3t = ht - yt # (1, 10)
+        d2t = np.dot(theta2.T, d3t) * (a2t * (1 - a2t)) # (1, 26)
+        delta1 = delta1 + np.dot(d2t[1:, np.newaxis], a1t[np.newaxis, :])
+        delta2 = delta2 + np.dot(d3t[:, np.newaxis], a2t[np.newaxis, :])
+    delta1 = delta1/m
+    delta2 = delta2/m
+    #Gradiente de cada delta
+    delta1[:,1:] = delta1[:,1:] + (reg *theta1[:,1:]) / m
+    delta2[:,1:] = delta2[:,1:] + (reg *theta2[:,1:]) / m
+    #Juntamos los gradientes
+    gradiente = np.concatenate((np.ravel(delta1),np.ravel(delta2)))
+    return cost, gradiente
 
 
 
@@ -159,7 +139,7 @@ def main():
     ######
     num_entradas = 11
     #Las unidades de la capa oculta
-    num_ocultas = 25
+    num_ocultas = 40
     #Las etiquetas de la salida
     num_etiquetas = 2
     #Y.reshape(Y.shape[0],1)
@@ -185,15 +165,16 @@ def main():
     theta1,theta2 = unroll_thetas(result.x,num_entradas,num_ocultas,num_etiquetas)
     #Creamos la NN con las thetas optimizadas
     X= add_ones(X)
-    h = forward_propagate(theta1, theta2,X)[3]
+    h = forward_propagate(X,theta1, theta2)[3]
+    print("HOLAAAAAAA")
     print(h[0])
     print(len(h))
+    print(len(X))
     correct = 0
     wrong = 0
     falsePositive = 0
     falseNegative = 0
     #Y comparamos la respuesta de la NN con la real
-    print("Lenx",len(X))
     for i in range(len(X)):
         maxIndex = np.argmax(h[i])
         if(maxIndex == Y[i]):
@@ -204,16 +185,13 @@ def main():
                 falseNegative +=1
             else:
                 falsePositive += 1
-        print("hola")
+       
     print()
     print("Hit: ", correct)
     print("Miss: ", wrong)
     print("False Positives: ", falsePositive)
     print("False Negatives: ", falseNegative)
     print("Accuracy: ",format((correct / (correct+wrong))*100, '.2f' ),"%")
-
-    
-
 
     
 main()

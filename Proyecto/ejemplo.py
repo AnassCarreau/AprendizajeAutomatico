@@ -31,7 +31,7 @@ def main():
     ######
     input_layer_size = 11
     #Las unidades de la capa oculta
-    hidden_layer_size = 25
+    hidden_layer_size = 40
     #Las etiquetas de la salida
     num_etiquetas = 2
     #Y.reshape(Y.shape[0],1)
@@ -58,6 +58,7 @@ def main():
     X = add_ones(X)
     h = forward_propagate(X, theta1, theta2)[4]
     print("HOLAAAAAAA")
+    print(h[0])
     print(len(h))
     print(len(X))
     correct = 0
@@ -129,6 +130,7 @@ def forward_propagate(X, theta1, theta2):
     a2 = np.hstack([np.ones([m, 1]), sigmoid(z2)])
     z3 = np.dot(a2, theta2.T)
     h = sigmoid(z3)
+    #print("a2 ",len(a2) )
     return X, z2, a2, z3, h
 
 def add_ones(valores):
